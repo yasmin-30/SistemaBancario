@@ -6,6 +6,15 @@ import java.util.Scanner;
 
 public class Sistema {
 
+	static Conta buscaDeContas(int indice, ArrayList<Conta> contas) {
+		for (Conta conta : contas) {
+			if (conta.getId() == indice) {	
+				return conta;
+			}
+		}
+		return null;
+	}
+	
 	public static void main(String[] args) {
 		Scanner leitor = new Scanner(System.in);
 		ArrayList<Conta> contas = new ArrayList<Conta>();
@@ -16,13 +25,12 @@ public class Sistema {
 		System.out.println("========================================");		
 		
 		boolean executando = false;
-		boolean verificacaoAcoes = false;
-		boolean verificadorSaldo = false;
 		
 		while(!executando) {
+			Conta conta = null;
 			System.out.println("");
 			System.out.println("---O QUE DESEJA FAZER?---");
-			System.out.println("0 - Criar conta;\n1 - Depósito;\n2 - Saque;\n3 - Transferência;\n4 - Listar contas;\n5 - Calcular total de tributos;\n6 - Sair.");
+			System.out.println("0 - Criar conta;\n1 - Realizar Depósito;\n2 - Realizar Saque;\n3 - Realizar Transferência;\n4 - Listar contas;\n5 - Calcular total de tributos;\n6 - Sair.");
 			int acao = leitor.nextInt();
 			leitor.nextLine();
 		
@@ -45,12 +53,14 @@ public class Sistema {
 						ContaCorrente corrente = new ContaCorrente(nome, id, saldo);
 						contas.add(corrente);
 						System.out.println("Conta corrente criada com sucesso! O número da conta é: " + id);
+						id+=1;
 						break;
 						
 					case 2:
 						ContaPoupanca poupanca = new ContaPoupanca(nome, id, saldo);
 						contas.add(poupanca);
 						System.out.println("Conta poupança criada com sucesso! O número da conta é: " + id);
+						id+=1;
 						break;
 						
 					default:
@@ -68,17 +78,17 @@ public class Sistema {
 				double valorDeposito = leitor.nextDouble();
 				
 				//Achar na lista
-				verificacaoAcoes = false;
-				for (Conta conta : contas) {
-					if (conta.getId() == idDeposito) {
-							conta.depositar(valorDeposito);	
-							System.out.println("Valor depositado com sucesso!");
-							verificacaoAcoes = true;
-					}
-				}
+				conta = buscaDeContas(idDeposito, contas);
 				
-				if(verificacaoAcoes == false) {
+				if(conta == null) {
 					System.out.println("ERRO! O número de conta informado não existe!");
+				} else {
+					boolean verificacaoDeposito = conta.depositar(valorDeposito);
+					if(verificacaoDeposito == true) {
+						System.out.println("Valor depositado com sucesso!");
+					} else {
+						System.out.println("O valor informado é negativo e, por isso, não será depositado!");
+					}
 				}
 	
 				break;
@@ -90,20 +100,17 @@ public class Sistema {
 				System.out.println("Informe o valor a ser sacado: ");
 				double valorSaque = leitor.nextDouble();
 				
-				verificacaoAcoes = false;
-				verificadorSaldo = false;
-				for (Conta conta : contas) {
-					if (conta.getId() == idSaque) {
-							verificadorSaldo = conta.sacar(valorSaque);
-							if(verificadorSaldo == true) {
-								System.out.println("Valor sacado com sucesso!");
-							}							
-							verificacaoAcoes = true;
-					}
-				}
+				conta = buscaDeContas(idSaque, contas);
 				
-				if(verificacaoAcoes == false) {
+				if(conta == null) {
 					System.out.println("ERRO! O número de conta informado não existe!");
+				} else {
+					boolean verificacaoSacar = conta.sacar(valorSaque);
+					if(verificacaoSacar == true) {
+						System.out.println("Valor sacado com sucesso!");
+					} else {
+						System.out.println("ERRO! O valor não pôde ser sacado!");
+					}
 				}
 				
 				break;
@@ -111,41 +118,26 @@ public class Sistema {
 			case 3: //TRANSFERENCIA
 				System.out.println("Informe o número da conta de origem da transferência: ");
 				int idOrigem = leitor.nextInt();
+				Conta contaOrigem = buscaDeContas(idOrigem, contas);
 				
 				System.out.println("Informe o número da conta de destino da transferência: ");
 				int idDestino = leitor.nextInt();
+				Conta contaDestino = buscaDeContas(idDestino, contas);
 				
 				System.out.println("Informe o valor a ser transferido: ");
 				double valorTransferencia = leitor.nextDouble();
 				
-				verificacaoAcoes = false;
-				boolean verificacaoDestino = false;
-				verificadorSaldo = false;
-				int indiceOrigem = 0;
-				int indiceDestino = 0;
-				for (int i = 0; i < contas.size(); i++) {
-					if (contas.get(i).getId() == idOrigem) {
-						indiceOrigem = i;
-						verificacaoAcoes = true;
-					}
-					if(contas.get(i).getId() == idDestino) {
-						indiceDestino = i;
-						verificacaoDestino = true;
-					}
-				}
-				
-				if(verificacaoAcoes == false) {
-					System.out.println("ERRO! O número de conta de origem informado não existe!");
-				} else if(verificacaoDestino == false) {
-					System.out.println("ERRO! O número de conta de destino informado não existe!");
+				//OLHAR ISSOOOOOO
+				if(contaOrigem != null && contaDestino != null) {
+					contaOrigem.transferir(contaDestino, valorTransferencia);
+				} else if(contaOrigem == null && contaDestino != null) {
+					System.out.println("ERRO! O número da conta de origem informado não existe!");
+				} else if(contaOrigem != null && contaDestino == null) {
+					System.out.println("ERRO! O número da conta de destino informado não existe!");
 				} else {
-					verificadorSaldo = contas.get(indiceOrigem).transferir(valorTransferencia);
-					contas.get(indiceDestino).depositar(valorTransferencia);
-					if(verificadorSaldo == true) {
-						System.out.println("Valor transferido com sucesso!");
-					}	
+					System.out.println("ERRO! Os números das contas de origem e de destino informado não existem!");
 				}
-				
+					
 				break;
 				
 			case 4: //LISTAR CONTAS
@@ -158,19 +150,19 @@ public class Sistema {
 					System.out.println("               NUBANCO               ");
 					System.out.println("========================================");
 					
-					for(Conta conta: contas) {
-						conta.infosConta(conta);
+					for(Conta contaNaLista: contas) {
+						contaNaLista.infosConta(conta);
 					}
 				}
 				break;
 			
 			case 5: //CALCULAR TOTAL TRIBUTOS
 				double totalTributos = 0;
-				for (Conta conta : contas) {
+				for (Conta contaNaLista : contas) {
 					// Verifica se a conta da iteração atual implementa a interface ITributavel
-					if (conta instanceof ITributavel) {
+					if (contaNaLista instanceof ITributavel) {
 						// Se sim, fazemos um "cast" para poder chamar o método da interface
-						ITributavel contaTributavel = (ITributavel) conta;
+						ITributavel contaTributavel = (ITributavel) contaNaLista;
 						totalTributos += contaTributavel.calculaTributos();
 					}
 				}
@@ -191,7 +183,7 @@ public class Sistema {
 				System.out.println("\nAção inválida! Digite um número válido de ação.");
 				break;
 			}
-			id+=1;
+			
 		}
 		
 		

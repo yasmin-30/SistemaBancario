@@ -4,6 +4,7 @@ public class ContaCorrente extends Conta implements ITributavel{
 
 	public ContaCorrente(String cliente, int id, double saldo) {
 		super(cliente, id, saldo);
+		this.tipo = "Corrente";
 	}
 
 	@Override
@@ -12,19 +13,19 @@ public class ContaCorrente extends Conta implements ITributavel{
 		if(verificacao<=saldo && verificacao>=0) {
 			saldo-=verificacao;
 			return true;
-		} else if (verificacao>=saldo){
-			System.out.println("Saldo insuficiente!");
-			return false;
 		} else {
-			System.out.println("O valor passado é negativo, passe uma valor válido!");
 			return false;
 		}
 		
 	}
 
 	@Override
-	public boolean transferir(double valor) {
-		return sacar(valor);	
+	public void transferir(Conta destino, double valor) {
+		if(sacar(valor) == true) {
+			destino.depositar(valor);
+		} else {
+			System.out.println("A transferência não foi concluída, pois o valor passado não é válido!");
+		}
 		
 	}
 

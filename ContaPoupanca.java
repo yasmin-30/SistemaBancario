@@ -4,6 +4,7 @@ public class ContaPoupanca  extends Conta{
 	
 	public ContaPoupanca(String cliente, int id, double saldo) {
 		super(cliente, id, saldo);
+		this.tipo = "Poupança";
 	}
 
 	@Override
@@ -11,17 +12,19 @@ public class ContaPoupanca  extends Conta{
 		if(valor<=saldo && valor>=0) {
 			saldo-=valor;
 			return true;
-		} else if (valor>=saldo){
-			System.out.println("Saldo insuficiente!");
-			return false;
 		} else {
-			System.out.println("O valor passado é negativo, passe uma valor válido!");
+			System.out.println("O valor passado é negativo e, por isso, não será sacado!");
 			return false;
 		}
 	}
 
 	@Override
-	public boolean transferir(double valor) {
-		return sacar(valor);		
+	public void transferir(Conta destino, double valor) {
+		if(sacar(valor) == true) {
+			destino.depositar(valor);
+		} else {
+			System.out.println("A transferência não foi concluída, pois o valor passado não é válido!");
+		}
+		
 	}
 }

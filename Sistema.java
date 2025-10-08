@@ -39,9 +39,15 @@ public class Sistema {
 				System.out.println("Escreva o nome do cliente: ");
 				String nome = leitor.nextLine();
 				
-				System.out.println("Insira o saldo da conta: ");
-				double saldo = leitor.nextDouble();
-				leitor.nextLine();
+				double saldo = -1;
+				while(saldo < 0) {
+					System.out.println("Insira o saldo da conta: ");
+					saldo = leitor.nextDouble();
+					leitor.nextLine();
+					if(saldo<0) {
+						System.out.println("Insira um valor de saldo válido!");
+					}
+				}
 				
 				int tipoConta = 0;
 				while(tipoConta>2 || tipoConta < 1) {
@@ -143,7 +149,7 @@ public class Sistema {
 			case 4: //LISTAR CONTAS
 				System.out.println("---LISTAGEM DAS CONTAS---");
 				if(contas.size()==0) {
-					System.out.println("Você ainda não criou nenhume conta!");
+					System.out.println("Você ainda não criou nenhuma conta!");
 				}else {
 			        System.out.println("");
 					System.out.println("\n========================================");
@@ -175,7 +181,7 @@ public class Sistema {
 			case 6: //SAIR
 				executando = true;
 				System.out.println("\n========================================");
-				System.out.println("              VOLTE SEMPRE!              ");
+				System.out.println("         VOLTE SEMPRE AO NUBANCO         ");
 				System.out.println("========================================");
 				break;
 				
